@@ -97,6 +97,8 @@ This guide provides a quick way to get started with Docusaurus Generator. For mo
 * **Generate documentation with AI enhancement**:
   ```bash
   docusaurus-generator /path/to/your/repo --use-ai "openai/gpt-4o"
+  docusaurus-generator /path/to/your/repo --use-ai "ollama/llama3.3"
+
   ```
 
 * **Using from Python**:
