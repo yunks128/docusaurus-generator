@@ -172,4 +172,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions, bug reports, or feature requests, please [open an issue](https://github.com/yourusername/docusaurus_generator/issues).
 
 Key maintainers:
-- [@yourusername](https://github.com/yourusername)
+- [@yunks128](https://github.com/yunks128)
