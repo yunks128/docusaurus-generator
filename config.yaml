@@ -1,0 +1,30 @@
+# Docusaurus Generator Configuration
+
+# Site configuration
+url: "https://your-docusaurus-site.example.com"
+baseUrl: "/"
+organizationName: "your-org"
+projectName: "your-project"
+
+# Content sections to generate (set to false to disable)
+sections:
+  overview: true
+  installation: true
+  api: true
+  guides: true
+  contributing: true
+  changelog: true
+  deployment: true
+  architecture: true
+  testing: true
+  security: true
+
+# AI enhancement configuration
+ai:
+  enabled: false
+  model: "openai/gpt-4o"  # Model to use for enhancement
+  
+# Docusaurus theme configuration
+theme:
+  primaryColor: "#4183c4"
+  secondaryColor: "#336699"

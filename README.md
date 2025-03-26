@@ -1,41 +1,31 @@
-<!-- Header block for project -->
-<hr>
+# Docusaurus Generator
 
 <div align="center">
-
-[INSERT YOUR LOGO IMAGE HERE (IF APPLICABLE)]
-<!-- ☝️ Replace with your logo (if applicable) via ![](https://uri-to-your-logo-image) ☝️ -->
-<!-- ☝️ If you see logo rendering errors, make sure you're not using indentation, or try an HTML IMG tag -->
-
-<h1 align="center">[INSERT YOUR REPO / PROJ NAME HERE]</h1>
-<!-- ☝️ Replace with your repo name ☝️ -->
-
+<h1 align="center">Docusaurus Generator</h1>
 </div>
 
-<pre align="center">[INSERT A SINGLE SENTENCE DESCRIBING THE PURPOSE OF YOUR REPO / PROJ]</pre>
-<!-- ☝️ Replace with a single sentence describing the purpose of your repo / proj ☝️ -->
+<pre align="center">Automated documentation generator that converts repository content into a complete Docusaurus site</pre>
 
-<!-- Header block for project -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
+[![npm](https://img.shields.io/badge/npm-required-red)](https://www.npmjs.com/)
 
-[INSERT YOUR BADGES HERE (SEE: https://shields.io)] [![SLIM](https://img.shields.io/badge/Best%20Practices%20from-SLIM-blue)](https://nasa-ammos.github.io/slim/)
-<!-- ☝️ Add badges via: https://shields.io e.g. ![](https://img.shields.io/github/your_chosen_action/your_org/your_repo) ☝️ -->
+![Docusaurus Generator Screenshot](https://via.placeholder.com/800x400?text=Docusaurus+Generator+Screenshot)
 
-[INSERT SCREENSHOT OF YOUR SOFTWARE, IF APPLICABLE]
-<!-- ☝️ Screenshot of your software (if applicable) via ![](https://uri-to-your-screenshot) ☝️ -->
+Docusaurus Generator is a powerful tool that analyzes your code repository, automatically extracts documentation, and generates a complete Docusaurus documentation site. It's designed for developers who want to maintain quality documentation with minimal effort. The tool intelligently parses READMEs, source code, and other repository files to create a comprehensive and well-structured documentation site.
 
-[INSERT MORE DETAILED DESCRIPTION OF YOUR REPOSITORY HERE]
-<!-- ☝️ Replace with a more detailed description of your repository, including why it was made and whom its intended for.  ☝️ -->
-
-[INSERT LIST OF IMPORTANT PROJECT / REPO LINKS HERE]
-<!-- example links>
-[Website](INSERT WEBSITE LINK HERE) | [Docs/Wiki](INSERT DOCS/WIKI SITE LINK HERE) | [Discussion Board](INSERT DISCUSSION BOARD LINK HERE) | [Issue Tracker](INSERT ISSUE TRACKER LINK HERE)
--->
+[Documentation](https://github.com/yourusername/docusaurus_generator#readme) | [Issue Tracker](https://github.com/yourusername/docusaurus_generator/issues)
 
 ## Features
 
-* [INSERT LIST OF FEATURES IMPORTANT TO YOUR USERS HERE]
-  
-<!-- ☝️ Replace with a bullet-point list of your features ☝️ -->
+* Automatically generates documentation from repository content
+* Creates a complete Docusaurus site structure with proper configuration
+* Extracts API documentation from source code
+* Generates homepage, sidebar, and navigation components
+* Supports optional AI enhancement for better documentation quality
+* One-command setup and launch of Docusaurus server
+* Works with multiple programming languages (Python, JavaScript, Java, etc.)
+* Customizable output via configuration files
 
 ## Contents
 
@@ -48,111 +38,138 @@
 
 ## Quick Start
 
-This guide provides a quick way to get started with our project. Please see our [docs]([INSERT LINK TO DOCS SITE / WIKI HERE]) for a more comprehensive overview.
+This guide provides a quick way to get started with Docusaurus Generator. For more comprehensive documentation, see the full documentation in this README.
 
 ### Requirements
 
-* [INSERT LIST OF REQUIREMENTS HERE]
-  
-<!-- ☝️ Replace with a numbered list of your requirements, including hardware if applicable ☝️ -->
+* Python 3.6 or higher
+* pip (Python package manager)
+* npm (Node.js package manager)
+* Git (for repository analysis)
 
 ### Setup Instructions
 
-1. [INSERT STEP-BY-STEP SETUP INSTRUCTIONS HERE, WITH OPTIONAL SCREENSHOTS]
-   
-<!-- ☝️ Replace with a numbered list of how to set up your software prior to running ☝️ -->
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/docusaurus_generator.git
+   cd docusaurus_generator
+   ```
+
+2. Install the package:
+   ```bash
+   pip install -e .
+   ```
+
+3. Verify installation:
+   ```bash
+   docusaurus-generator --help
+   ```
 
 ### Run Instructions
 
-1. [INSERT STEP-BY-STEP RUN INSTRUCTIONS HERE, WITH OPTIONAL SCREENSHOTS]
+1. Generate documentation for a repository:
+   ```bash
+   docusaurus-generator /path/to/your/repo --output-dir ./docs-site
+   ```
 
-<!-- ☝️ Replace with a numbered list of your run instructions, including expected results ☝️ -->
+2. Generate, install dependencies, and start the server in one command:
+   ```bash
+   docusaurus-generator /path/to/your/repo --install --start
+   ```
+
+3. Open your browser to view the generated documentation site:
+   ```
+   http://localhost:3000
+   ```
 
 ### Usage Examples
 
-* [INSERT LIST OF COMMON USAGE EXAMPLES HERE, WITH OPTIONAL SCREENSHOTS]
+* **Basic documentation generation**:
+  ```bash
+  docusaurus-generator /path/to/your/repo
+  ```
 
-<!-- ☝️ Replace with a list of your usage examples, including screenshots if possible, and link to external documentation for details ☝️ -->
+* **Generate documentation with custom configuration**:
+  ```bash
+  docusaurus-generator /path/to/your/repo --config ./my-config.yaml
+  ```
 
-### Build Instructions (if applicable)
+* **Generate documentation with AI enhancement**:
+  ```bash
+  docusaurus-generator /path/to/your/repo --use-ai "openai/gpt-4o"
+  ```
 
-1. [INSERT STEP-BY-STEP BUILD INSTRUCTIONS HERE, WITH OPTIONAL SCREENSHOTS]
+* **Using from Python**:
+  ```python
+  from docusaurus_generator import DocusaurusGenerator
+  
+  generator = DocusaurusGenerator(
+      repo_path="/path/to/your/repo",
+      output_dir="./docs-site",
+      config={"url": "https://example.com", "baseUrl": "/docs/"}
+  )
+  
+  generator.setup_and_start(install=True, start=True)
+  ```
 
-<!-- ☝️ Replace with a numbered list of your build instructions, including expected results / outputs with optional screenshots ☝️ -->
+### Available Command-line Options
 
-### Test Instructions (if applicable)
-
-1. [INSERT STEP-BY-STEP TEST INSTRUCTIONS HERE, WITH OPTIONAL SCREENSHOTS]
-
-<!-- ☝️ Replace with a numbered list of your test instructions, including expected results / outputs with optional screenshots ☝️ -->
+- `repo_path`: Path to the repository (required)
+- `--output-dir`, `-o`: Directory where documentation should be generated (default: `./docusaurus`)
+- `--config`, `-c`: Path to configuration file
+- `--use-ai`: Enable AI enhancement with specified model (e.g., "openai/gpt-4o")
+- `--verbose`, `-v`: Enable verbose logging
+- `--install`: Install Docusaurus dependencies
+- `--start`: Start Docusaurus development server after generation
 
 ## Changelog
 
 See our [CHANGELOG.md](CHANGELOG.md) for a history of our changes.
 
-See our [releases page]([INSERT LINK TO YOUR RELEASES PAGE]) for our key versioned releases.
-
-<!-- ☝️ Replace with links to your changelog and releases page ☝️ -->
+See our [releases page](https://github.com/yourusername/docusaurus_generator/releases) for our key versioned releases.
 
 ## Frequently Asked Questions (FAQ)
 
-[INSERT LINK TO FAQ PAGE OR PROVIDE FAQ INLINE HERE]
-<!-- example link to FAQ PAGE>
-Questions about our project? Please see our: [FAQ]([INSERT LINK TO FAQ / DISCUSSION BOARD])
--->
+1. **How does Docusaurus Generator decide what to include in the documentation?**
+   - It analyzes repository files including READMEs, source code, and configuration files to generate appropriate sections based on repository content.
 
-<!-- example FAQ inline format>
-1. Question 1
-   - Answer to question 1
-2. Question 2
-   - Answer to question 2
--->
+2. **Does it work with any programming language?**
+   - Yes, it works with multiple languages including Python, JavaScript, Java, C++, and others. The API documentation extraction features are language-specific.
 
-<!-- example FAQ inline with no questions yet>
-No questions yet. Propose a question to be added here by reaching out to our contributors! See support section below.
--->
+3. **How can I customize the generated documentation?**
+   - You can use a configuration file (YAML format) to specify various options. See the `config.yaml` sample for details.
 
-<!-- ☝️ Replace with a list of frequently asked questions from your project, or post a link to your FAQ on a discussion board ☝️ -->
+4. **What is the AI enhancement feature?**
+   - This optional feature uses AI to improve documentation quality by enhancing descriptions, adding examples, and improving readability.
+
+5. **Do I need to have Docusaurus installed beforehand?**
+   - No, the tool handles the Docusaurus installation process with the `--install` flag.
 
 ## Contributing
 
-[INSERT LINK TO CONTRIBUTING GUIDE OR FILL INLINE HERE]
-<!-- example link to CONTRIBUTING.md>
-Interested in contributing to our project? Please see our: [CONTRIBUTING.md](CONTRIBUTING.md)
--->
+Interested in contributing to our project? Please follow these steps:
 
-<!-- example inline contributing guide>
-1. Create an GitHub issue ticket describing what changes you need (e.g. issue-1)
-2. [Fork](INSERT LINK TO YOUR REPO FORK PAGE HERE, e.g. https://github.com/my_org/my_repo/fork) this repo
+1. Create a GitHub issue describing what changes you need
+2. [Fork](https://github.com/yourusername/docusaurus_generator/fork) this repo
 3. Make your modifications in your own fork
-4. Make a pull-request in this repo with the code in your fork and tag the repo owner / largest contributor as a reviewer
+4. Make a pull-request in this repo with the code in your fork and tag the repo owner as a reviewer
 
 **Working on your first pull request?** See guide: [How to Contribute to an Open Source Project on GitHub](https://kcd.im/pull-request)
--->
 
-[INSERT LINK TO YOUR CODE_OF_CONDUCT.md OR SHARE TEXT HERE]
-<!-- example link to CODE_OF_CONDUCT.md>
-For guidance on how to interact with our team, please see our code of conduct located at: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
--->
-
-<!-- ☝️ Replace with a text describing how people may contribute to your project, or link to your contribution guide directly ☝️ -->
-
-[INSERT LINK TO YOUR GOVERNANCE.md OR SHARE TEXT HERE]
-<!-- example link to GOVERNANCE.md>
-For guidance on our governance approach, including decision-making process and our various roles, please see our governance model at: [GOVERNANCE.md](GOVERNANCE.md)
--->
+We welcome contributions of all types including:
+- Bug fixes
+- Feature additions
+- Documentation improvements
+- Test case additions
+- Examples and usage samples
 
 ## License
 
-See our: [LICENSE](LICENSE)
-<!-- ☝️ Replace with the text of your copyright and license, or directly link to your license file ☝️ -->
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-[INSERT CONTACT INFORMATION OR PROFILE LINKS TO MAINTAINERS AMONG COMMITTER LIST]
+For questions, bug reports, or feature requests, please [open an issue](https://github.com/yourusername/docusaurus_generator/issues).
 
-<!-- example list of contacts>
-Key points of contact are: [@github-user-1](link to github profile) [@github-user-2](link to github profile)
--->
-
-<!-- ☝️ Replace with the key individuals who should be contacted for questions ☝️ -->
+Key maintainers:
+- [@yourusername](https://github.com/yourusername)
