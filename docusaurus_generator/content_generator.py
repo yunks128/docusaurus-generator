@@ -10,6 +10,7 @@ import logging
 from typing import Dict, List, Optional
 from datetime import datetime
 from pathlib import Path
+import shutil
 
 from .ai_enhancer import enhance_with_ai
 
@@ -117,103 +118,621 @@ class ContentGenerator:
 
 
     def generate_homepage(self):
-        """Generate src/pages/index.js and src/components/HomepageFeatures/index.js"""
-        # Define constants to avoid duplication
-        INDEX_JS = 'index.js'
-        PACKAGE_JSON = 'package.json'
+        """
+        Generate enhanced src/pages/index.js and src/components/HomepageFeatures/index.js
+        Creates a comprehensive homepage with hero banner, features section, and calls to action
+        based on the template provided.
+        """
+        # Create necessary directories
+        pages_dir = os.path.join(self.output_dir, 'src', 'pages')
+        components_dir = os.path.join(self.output_dir, 'src', 'components')
+        features_dir = os.path.join(components_dir, 'HomepageFeatures')
+        css_dir = os.path.join(self.output_dir, 'src', 'css')
         
+        os.makedirs(pages_dir, exist_ok=True)
+        os.makedirs(features_dir, exist_ok=True)
+        os.makedirs(css_dir, exist_ok=True)
+        
+        # Extract project information
         project_name = os.path.basename(self.repo_path)
-        repo_url = ""
+        repo_url = f"https://github.com/{project_name}"
         description = f"{project_name} documentation and resources."
-
-        # Extract from package.json if available
-        package_json_path = os.path.join(self.repo_path, PACKAGE_JSON)
-        if os.path.exists(package_json_path):
-            with open(package_json_path, 'r') as f:
-                package_data = json.load(f)
-                project_name = package_data.get('name', project_name)
-                description = package_data.get('description', description)
-                
-                if 'repository' in package_data:
-                    repo_data = package_data['repository']
-                    repo_url = repo_data if isinstance(repo_data, str) else repo_data.get('url', '')
-
-        # Create content for index.js
-        index_js_content = f"""import React from 'react';
+        
+        # Create index.js for homepage with hero banner and sections
+        index_js_content = f'''import clsx from 'clsx';
+    import Link from '@docusaurus/Link';
+    import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
     import Layout from '@theme/Layout';
-    import HomepageFeatures from '../components/HomepageFeatures';
+    import HomepageFeatures from '@site/src/components/HomepageFeatures';
+    import Heading from '@theme/Heading';
+    import styles from './index.module.css';
 
-    export default function Home() {{
+    function HomepageHeader() {{
+    const {{siteConfig}} = useDocusaurusContext();
     return (
-        <Layout
-        title="{project_name}"
-        description="{description}">
-        <main>
-            <HomepageFeatures />
-        </main>
-        </Layout>
+        <header className={{clsx('hero', styles.heroBanner)}}>
+        <div className="container">
+            <Heading as="h1" className={{styles.heroTitle}}>
+            {project_name}
+            </Heading>
+            <p className={{styles.heroSubtitle}}>{description}</p>
+            <div className={{styles.buttons}}>
+            <Link className="button button--primary button--lg" to="/docs">
+                ✅ Get Started
+            </Link>
+            <Link className="button button--primary button--lg" to="/docs/download">
+                ⬇️ Download Now
+            </Link>
+            <Link className="button button--primary button--lg" to="/about">
+                📪 Contact
+            </Link>
+            </div>
+            <div className={{styles.screenshotContainer}}>
+            <img
+                src="/img/800x400.png"
+                alt="Product Screenshot"
+                className={{styles.screenshot}}
+            />
+            </div>
+        </div>
+        </header>
     );
     }}
-    """
 
-        # Create content for HomepageFeatures/index.js
-        homepage_features_content = f"""import React from 'react';
-    import styles from './styles.module.css';
-
-    export default function HomepageFeatures() {{
+    function CustomerLogos() {{
     return (
-        <section className={{styles.features}}>
+        <section className={{styles.customerLogos}}>
         <div className="container">
-            <div className="row">
-            <div className="col col--4">
-                <h3>Quick Start</h3>
-                <p>Get started with {project_name} quickly by following the documentation and guides.</p>
+            <h2 className="sectionTitle">(Optional) Used By</h2>
+            <div className={{styles.logos}}>
+            <img src="/img/200x200.png" alt="Customer 1" />
+            <img src="/img/200x200.png" alt="Customer 2" />
+            <img src="/img/200x200.png" alt="Customer 3" />
             </div>
-            <div className="col col--4">
-                <h3>Features</h3>
-                <p>{description}</p>
+        </div>
+        </section>
+    );
+    }}
+
+    function Testimonials() {{
+    return (
+        <section className={{styles.testimonials}}>
+        <div className="container">
+            <h2 className="sectionTitle">(Optional) What People Say</h2>
+            <div className={{styles.quotes}}>
+            <blockquote>
+                <p>"This product is amazing!"</p>
+                <cite>- Happy Customer</cite>
+            </blockquote>
+            <blockquote>
+                <p>"It has transformed the way we work."</p>
+                <cite>- Satisfied Client</cite>
+            </blockquote>
+            <blockquote>
+                <p>"Incredible support and features."</p>
+                <cite>- Loyal User</cite>
+            </blockquote>
             </div>
-            <div className="col col--4">
-                <h3>Repository</h3>
-                <p><a href=\"{repo_url}\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Repository</a></p>
+        </div>
+        </section>
+    );
+    }}
+
+    function GetStarted() {{
+    return (
+        <section className={{styles.getStarted}}>
+        <div className="container">
+            <h2 className="sectionTitle">Get Started</h2>
+            <div className={{styles.getStartedContent}}>
+            <div>
+                <h3>For Users</h3>
+                <Link to="/docs/user" className={{styles.link}}>
+                Read the Users Guide
+                </Link>
+            </div>
+            <div>
+                <h3>For Developers</h3>
+                <Link to="/docs/developer" className={{styles.link}}>
+                Read the Developers Guide
+                </Link>
             </div>
             </div>
         </div>
         </section>
     );
     }}
-    """
 
-        # Apply AI enhancement if enabled
-        if self.use_ai:
-            index_js_content = enhance_with_ai(index_js_content, INDEX_JS, self.use_ai, self.logger)
-            homepage_features_content = enhance_with_ai(homepage_features_content, 'HomepageFeatures', self.use_ai, self.logger)
+    function LearnMore() {{
+    return (
+        <section className={{styles.learnMore}}>
+        <div className="container">
+            <h2 className="sectionTitle">Learn More</h2>
+            <ul className={{styles.learnMoreList}}>
+            <li>
+                <Link to="{repo_url}" className={{styles.link}}>
+                GitHub Repository
+                </Link>
+            </li>
+            <li>
+                <Link to="/docs/faqs" className={{styles.link}}>
+                Frequently Asked Questions
+                </Link>
+            </li>
+            <li>
+                <Link to="/blog" className={{styles.link}}>
+                News and Updates
+                </Link>
+            </li>
+            </ul>
+        </div>
+        </section>
+    );
+    }}
 
-        # Create directories and write files
-        index_js_dir = os.path.join(self.output_dir, 'src', 'pages')
-        features_js_dir = os.path.join(self.output_dir, 'src', 'components', 'HomepageFeatures')
-        
-        os.makedirs(index_js_dir, exist_ok=True)
-        os.makedirs(features_js_dir, exist_ok=True)
+    export default function Home() {{
+    const {{siteConfig}} = useDocusaurusContext();
+    return (
+        <Layout title={{`Welcome to ${{siteConfig.title}}`}} description="{description}">
+        <HomepageHeader />
+        <main>
+            <HomepageFeatures />
+            <GetStarted />
+            <LearnMore />
+            <CustomerLogos />
+            <Testimonials />
+        </main>
+        </Layout>
+    );
+    }}
+    '''
 
-        # Create styles.module.css for HomepageFeatures
-        with open(os.path.join(features_js_dir, 'styles.module.css'), 'w') as f:
-            f.write("""
-.features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
-}
-""")
+        # Create index.module.css for styling the homepage
+        index_module_css = '''.heroBanner {
+    background-color: #00467a;
+    color: #ffffff;
+    padding: 6rem 0;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    }
 
-        with open(os.path.join(index_js_dir, INDEX_JS), 'w') as f:
+    .heroBanner h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    }
+
+    .heroBanner p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #ffffff;
+    }
+
+    [data-theme='dark'] .heroBanner {
+    background-color: #0d3856;
+    color: #e0e0e0;
+    }
+
+    [data-theme='dark'] .heroBanner h1,
+    [data-theme='dark'] .heroBanner p {
+    color: #e0e0e0;
+    }
+
+    .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    }
+
+    .screenshotContainer {
+    margin-top: 2rem;
+    text-align: left;
+    }
+
+    .screenshot {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    }
+
+    .customerLogos, .testimonials, .getStarted, .learnMore {
+    padding: 4rem 0;
+    }
+
+    .logos {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    }
+
+    .quotes {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+    }
+
+    .quotes blockquote {
+    font-size: 1.25rem;
+    font-style: italic;
+    max-width: 800px;
+    margin: 0;
+    }
+
+    .quotes cite {
+    display: block;
+    margin-top: 1rem;
+    font-size: 1rem;
+    }
+
+    .getStartedContent {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    }
+
+    .getStartedContent div {
+    flex: 1;
+    margin: 0px 0px;
+    min-width: 200px;
+    }
+
+    .learnMoreList {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    }
+
+    .learnMoreList li {
+    margin: 10px 0;
+    }
+
+    .link {
+    text-decoration: none;
+    font-weight: 600;
+    }
+
+    .link:hover {
+    text-decoration: underline;
+    }
+    '''
+
+        # Create enhanced HomepageFeatures component
+        homepage_features_content = f'''import React from 'react';
+    import Heading from '@theme/Heading';
+    import styles from './styles.module.css';
+
+    const FeatureList = [
+    {{
+        title: 'Easy to Use',
+        Svg: () => <img src="/img/200x200.png" alt="Easy to Use" />,
+        description: (
+        <>
+            {project_name} was designed from the ground up to be easily installed and
+            used to get your project up and running quickly.
+        </>
+        ),
+    }},
+    {{
+        title: 'Focus on What Matters',
+        Svg: () => <img src="/img/200x200.png" alt="Focus on What Matters" />,
+        description: (
+        <>
+            {project_name} lets you focus on your content and documentation,
+            while we handle all the technical details behind the scenes.
+        </>
+        ),
+    }},
+    {{
+        title: 'Extensible',
+        Svg: () => <img src="/img/200x200.png" alt="Extensible" />,
+        description: (
+        <>
+            Extend or customize your project's documentation by adding and 
+            configuring various plugins and components.
+        </>
+        ),
+    }},
+    ];
+
+    function Feature({{Svg, title, description}}) {{
+    return (
+        <div className="col col--4">
+        <div className={{styles.featureItem}}>
+            <div className={{styles.featureImage}}>
+            <Svg className={{styles.featureSvg}} role="img" />
+            </div>
+            <div className={{styles.featureContent}}>
+            <Heading as="h3">{{title}}</Heading>
+            <p>{{description}}</p>
+            </div>
+        </div>
+        </div>
+    );
+    }}
+
+    export default function HomepageFeatures() {{
+    return (
+        <section className={{styles.features}}>
+        <div className="container">
+            <h2 className="sectionTitle">Key Features</h2>
+            <div className="row">
+            {{FeatureList.map((props, idx) => (
+                <Feature key={{idx}} {{...props}} />
+            ))}}
+            </div>
+        </div>
+        </section>
+    );
+    }}
+    '''
+
+        # Create styles for HomepageFeatures
+        homepage_features_styles = '''.features {
+    padding: 4rem 0;
+    width: 100%;
+    }
+
+    .featureItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    height: 100%;
+    }
+
+    .featureImage {
+    margin-bottom: 1rem;
+    }
+
+    .featureSvg {
+    height: 200px;
+    width: 200px;
+    }
+
+    .featureContent {
+    text-align: center;
+    }
+
+    .featureContent h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    }
+
+    @media screen and (max-width: 966px) {
+    .featureItem {
+        padding: 1rem;
+    }
+    }
+    '''
+
+        # Create custom.css with enhanced styles
+        custom_css = '''/**
+    * Any CSS included here will be global. The classic template
+    * bundles Infima by default. Infima is a CSS framework designed to
+    * work well for content-centric websites.
+    */
+
+    /* Override the default Infima variables */
+    :root {
+    --ifm-color-primary: #005b96;
+    --ifm-color-primary-dark: #00467a;
+    --ifm-color-primary-darker: #003865;
+    --ifm-color-primary-darkest: #00294f;
+    --ifm-color-primary-light: #0073b1;
+    --ifm-color-primary-lighter: #0086cc;
+    --ifm-color-primary-lightest: #0099e6;
+    --ifm-code-font-size: 95%;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
+    --ifm-font-family-base: 'Open Sans', sans-serif;
+    --ifm-heading-font-weight: 600;
+    }
+
+    /* Adjustments for dark mode */
+    [data-theme='dark'] {
+    --ifm-color-primary: #66b2ff;
+    --ifm-color-primary-dark: #4d9de0;
+    --ifm-color-primary-darker: #3388cc;
+    --ifm-color-primary-darkest: #1a73b2;
+    --ifm-color-primary-light: #80c6ff;
+    --ifm-color-primary-lighter: #99d4ff;
+    --ifm-color-primary-lightest: #b3e2ff;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Add styles for the navbar links */
+    .navbar__link {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    }
+
+    .navbar__link:hover {
+    text-decoration: underline;
+    color: inherit;
+    }
+
+    /* Ensure the sidebar links follow the same pattern */
+    .menu__link {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    }
+
+    .menu__link:hover {
+    text-decoration: underline;
+    color: inherit;
+    }
+
+    /* Title styles */
+    .navbar__title, .navbar__brand {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 600;
+    }
+
+    .navbar__title:hover, .navbar__brand:hover {
+    text-decoration: none;
+    color: inherit;
+    }
+
+    /* Section styles */
+    .section {
+    padding: 60px 0;
+    }
+
+    .sectionTitle {
+    font-size: 2rem;
+    color: var(--ifm-color-primary-dark);
+    text-align: left;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    }
+
+    [data-theme='dark'] .sectionTitle {
+    color: #ffffff;
+    }
+
+    /* Button styles */
+    .button--primary {
+    background-color: var(--ifm-color-primary);
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    }
+
+    .button--primary:hover {
+    background-color: var(--ifm-color-primary-dark);
+    color: #ffffff;
+    }
+
+    .button--secondary {
+    background-color: #025c8d;
+    color: #ffffff !important;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    }
+
+    .button--secondary:hover {
+    background-color: #003865;
+    color: #ffffff;
+    }
+
+    /* Ensure proper contrast in dark mode */
+    [data-theme='dark'] .button--primary, 
+    [data-theme='dark'] .button--secondary,
+    [data-theme='dark'] .button--primary:hover, 
+    [data-theme='dark'] .button--secondary:hover {
+    color: #ffffff;
+    }
+
+    /* Container styles */
+    .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    }
+    '''
+
+        # Write files
+        with open(os.path.join(pages_dir, 'index.js'), 'w') as f:
             f.write(index_js_content)
-
-        with open(os.path.join(features_js_dir, INDEX_JS), 'w') as f:
+        
+        with open(os.path.join(pages_dir, 'index.module.css'), 'w') as f:
+            f.write(index_module_css)
+        
+        with open(os.path.join(features_dir, 'index.js'), 'w') as f:
             f.write(homepage_features_content)
+        
+        with open(os.path.join(features_dir, 'styles.module.css'), 'w') as f:
+            f.write(homepage_features_styles)
+        
+        with open(os.path.join(css_dir, 'custom.css'), 'w') as f:
+            f.write(custom_css)
+        
+        # Create static image placeholder directory
+        img_dir = os.path.join(self.output_dir, 'static', 'img')
+        os.makedirs(img_dir, exist_ok=True)
+        
+        # Create a placeholder logo file if it doesn't exist
+        if not os.path.exists(os.path.join(img_dir, 'logo.svg')):
+            with open(os.path.join(img_dir, 'logo.svg'), 'w') as f:
+                f.write(f'''<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#005b96"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="40">
+            {project_name[0:1].upper()}
+        </text>
+    </svg>''')
+        
+        # Create placeholder image files if they don't exist
+        for size in ['200x200', '800x400']:
+            width, height = map(int, size.split('x'))
+            if not os.path.exists(os.path.join(img_dir, f'{size}.png')):
+                self._create_placeholder_image(os.path.join(img_dir, f'{size}.png'), width, height)
+        
+        # Create favicon if it doesn't exist
+        if not os.path.exists(os.path.join(img_dir, 'favicon.ico')):
+            shutil.copy(
+                os.path.join(img_dir, 'logo.svg'),
+                os.path.join(img_dir, 'favicon.ico')
+            )
+        
+        if self.use_ai:
+            # Enhance files with AI if enabled
+            with open(os.path.join(pages_dir, 'index.js'), 'r') as f:
+                enhanced_index = enhance_with_ai(f.read(), 'index.js', self.use_ai, self.logger)
+                with open(os.path.join(pages_dir, 'index.js'), 'w') as f_out:
+                    f_out.write(enhanced_index)
+            
+            with open(os.path.join(features_dir, 'index.js'), 'r') as f:
+                enhanced_features = enhance_with_ai(f.read(), 'HomepageFeatures', self.use_ai, self.logger)
+                with open(os.path.join(features_dir, 'index.js'), 'w') as f_out:
+                    f_out.write(enhanced_features)
+        
+        self.logger.info(f"Generated enhanced homepage with title, subtitle, and documentation links")
 
-        self.logger.info(f"Generated homepage {INDEX_JS} and HomepageFeatures/{INDEX_JS}")
+    def _create_placeholder_image(self, filepath, width, height):
+        """Create a simple placeholder image."""
+        try:
+            # Try to use PIL if available
+            from PIL import Image, ImageDraw, ImageFont
+            img = Image.new('RGB', (width, height), color=(240, 240, 240))
+            draw = ImageDraw.Draw(img)
+            
+            # Add text with dimensions
+            text = f"{width}×{height}"
+            try:
+                font = ImageFont.truetype("arial.ttf", 20)
+            except IOError:
+                font = ImageFont.load_default()
+            
+            text_width, text_height = draw.textbbox((0, 0), text, font=font)[2:4]
+            text_position = ((width - text_width) // 2, (height - text_height) // 2)
+            draw.text(text_position, text, fill=(100, 100, 100), font=font)
+            
+            # Draw a border
+            draw.rectangle([(0, 0), (width-1, height-1)], outline=(200, 200, 200))
+            
+            img.save(filepath)
+        except ImportError:
+            # If PIL is not available, create an empty file
+            with open(filepath, 'wb') as f:
+                f.write(b'')
+            self.logger.warning(f"PIL not available, created empty placeholder at {filepath}")
 
     def generate_sidebar(self, sections: Dict[str, Optional[str]]) -> None:
         """Generate sidebar configuration."""
