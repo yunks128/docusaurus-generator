@@ -802,6 +802,8 @@ class ContentGenerator:
             
             f.write("  ],\n")
             f.write("};\n")
+
+
     def _generate_overview(self) -> Optional[str]:
         """Generate overview page from README."""
         readme_path = self._find_file("README.md")
@@ -916,7 +918,7 @@ class ContentGenerator:
             return None
             
         return self._format_page(
-            title="Guides & Tutorials",
+            title="Guides",
             content="\n\n---\n\n".join(guides_content)
         )
 
