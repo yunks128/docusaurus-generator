@@ -51,8 +51,8 @@ This guide provides a quick way to get started with Docusaurus Generator. For mo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/docusaurus_generator.git
-   cd docusaurus_generator
+   git clone https://github.com/yunks128/docusaurus-generator.git
+   cd docusaurus-generator
    ```
 
 2. Install the package:
