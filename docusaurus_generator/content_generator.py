@@ -833,7 +833,8 @@ class ContentGenerator:
                 install_section = self._extract_section(content, "Installation", "Usage")
                 if install_section:
                     install_content.append(install_section)
-        
+
+                
         # Check for package files
         package_files = {
             'Python': ['requirements.txt', 'setup.py'],
@@ -899,20 +900,42 @@ class ContentGenerator:
             title="API",
             content="\n".join(api_content)
         )
-        
+
+
     def _generate_guides(self) -> Optional[str]:
         """Generate user guides from docs directory."""
         guides_content = []
         docs_dirs = ['docs', 'doc', 'guides', 'tutorials']
         
+        # Process each directory
         for docs_dir in docs_dirs:
             dir_path = os.path.join(self.repo_path, docs_dir)
-            if os.path.exists(dir_path):
-                for root, _, files in os.walk(dir_path):
-                    for file in files:
-                        if file.endswith(('.md', '.rst')):
-                            with open(os.path.join(root, file), 'r') as f:
-                                guides_content.append(f.read())
+            if not os.path.exists(dir_path):
+                continue
+                
+            # Process each markdown file in the directory
+            for root, _, files in os.walk(dir_path):
+                for file in files:
+                    if not file.endswith(('.md', '.rst')):
+                        continue
+                        
+                    file_path = os.path.join(root, file)
+                    rel_path = os.path.relpath(file_path, self.repo_path)
+                    
+                    try:
+                        # Read the file
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        # Process the content through our MDX sanitizer
+                        content = self._sanitize_for_mdx(content)
+                        
+                        # Add file info header
+                        file_header = f"## {rel_path}\n\n"
+                        guides_content.append(file_header + content)
+                    except Exception as e:
+                        print(f"Error processing file {file_path}: {str(e)}")
+                        guides_content.append(f"## {rel_path}\n\n*File could not be processed due to an error.*")
         
         if not guides_content:
             return None
@@ -921,6 +944,52 @@ class ContentGenerator:
             title="Guides",
             content="\n\n---\n\n".join(guides_content)
         )
+
+    def _sanitize_for_mdx(self, content: str) -> str:
+        """
+        Sanitize content to be MDX-compatible.
+        This handles common issues that cause MDX compilation errors.
+        """
+        import re
+        
+        # Step 1: Save code blocks to protect them from modifications
+        code_blocks = []
+        
+        def save_code_block(match):
+            code_blocks.append(match.group(0))
+            return f"CODE_BLOCK_{len(code_blocks)-1}"
+        
+        # Save fenced code blocks
+        content = re.sub(r'```[\s\S]*?```', save_code_block, content)
+        
+        # Save inline code blocks
+        content = re.sub(r'`[^`]*`', save_code_block, content)
+        
+        # Step 2: Fix common MDX issues
+        
+        # Fix 1: Replace < followed by numbers (like <3) with &lt;
+        content = re.sub(r'<(\d)', r'&lt;\1', content)
+        
+        # Fix 2: Replace unclosed HTML/JSX tags
+        # This regex looks for opening tags that aren't properly closed
+        content = re.sub(r'<([a-zA-Z][a-zA-Z0-9_:-]*)(?![^<>]*>)', r'&lt;\1', content)
+        
+        # Fix 3: Replace HTML comments with MDX-safe comments
+        content = re.sub(r'<!--([\s\S]*?)-->', r'{/* \1 */}', content)
+        
+        # Fix 4: Ensure proper spacing in self-closing tags
+        content = re.sub(r'<([a-zA-Z][a-zA-Z0-9_:-]*[^>]*?)\/>', r'<\1 />', content)
+        
+        # Fix 5: Escape curly braces that might be interpreted as JSX expressions
+        content = re.sub(r'(?<![`\\{]){(?!\s*[/#])', r'&#123;', content)
+        content = re.sub(r'(?<![`\\}])}', r'&#125;', content)
+        
+        # Step 3: Restore code blocks
+        for i, block in enumerate(code_blocks):
+            content = content.replace(f"CODE_BLOCK_{i}", block)
+        
+        return content
+
 
     def _generate_contributing(self) -> Optional[str]:
         """Generate contributing guidelines."""
